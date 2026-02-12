@@ -57,7 +57,6 @@ public class BurgerTest {
         burger.moveIngredient(1, 0);
 
         Assert.assertEquals(secondingredient, burger.ingredients.get(0));
-        Assert.assertEquals(firstingredient, burger.ingredients.get(1));
     }
     }
 

@@ -32,36 +32,62 @@ public class BurgerReceiptParameterizedTest {
         };
     }
 
-        @Test
-        public void  shouldReturnCorrectReceipt() {
-            Burger burger = new Burger();
-            Burger burgerSpy = Mockito.spy(burger);
+    @Test
+    public void shouldPrintBunNameTwice() {
+        Burger burger = new Burger();
+        Bun bunMock = Mockito.mock(Bun.class);
 
-            Bun bunMock = Mockito.mock(Bun.class);
-            Mockito.when(bunMock.getName()).thenReturn(bunName);
-            burgerSpy.setBuns(bunMock);
+        Mockito.when(bunMock.getName()).thenReturn(bunName);
+        Mockito.when(bunMock.getPrice()).thenReturn(price / 2);
 
-            if (ingredientType != null){
-                Ingredient ingredientMock = Mockito.mock(Ingredient.class);
-                Mockito.when(ingredientMock.getType()).thenReturn(ingredientType);
-                Mockito.when(ingredientMock.getName()).thenReturn(ingredientName);
-                burgerSpy.addIngredient(ingredientMock);
-            }
+        burger.setBuns(bunMock);
+        burger.getReceipt();
 
-            Mockito.when(burgerSpy.getPrice()).thenReturn(price);
-
-            String receipt = burgerSpy.getReceipt();
-
-            Mockito.verify(bunMock, Mockito.times(2).description("Название булки должно выводиться дважды (сверху и снизу)")).getName();
-
-            if (ingredientType != null) {
-                String expectedType = ingredientType.toString().toLowerCase();
-                Assert.assertTrue("Тип ингредиента в чеке должен быть в нижнем регистре",
-                        receipt.contains(expectedType));
-            }
-
-            Assert.assertTrue("Цена в чеке должна быть отформатирована через %f",
-                    receipt.contains(String.format("Price: %f", price)));
-
-        }
+        Mockito.verify(bunMock, Mockito.times(2)
+                        .description("Название булки должно выводиться дважды (сверху и снизу)"))
+                .getName();
     }
+    @Test
+    public void shouldPrintIngredientTypeInLowerCase() {
+        if (ingredientType == null) {
+            return; // этот сценарий не про ингредиенты
+        }
+
+        Burger burger = new Burger();
+        Bun bunMock = Mockito.mock(Bun.class);
+
+        Mockito.when(bunMock.getName()).thenReturn(bunName);
+        Mockito.when(bunMock.getPrice()).thenReturn(price / 2);
+        burger.setBuns(bunMock);
+
+        Ingredient ingredientMock = Mockito.mock(Ingredient.class);
+        Mockito.when(ingredientMock.getType()).thenReturn(ingredientType);
+        Mockito.when(ingredientMock.getName()).thenReturn(ingredientName);
+        Mockito.when(ingredientMock.getPrice()).thenReturn(0f);
+        burger.addIngredient(ingredientMock);
+
+        String receipt = burger.getReceipt();
+
+        Assert.assertTrue(
+                "Тип ингредиента в чеке должен быть в нижнем регистре",
+                receipt.contains(ingredientType.toString().toLowerCase())
+        );
+    }
+    @Test
+    public void shouldFormatPriceWithF() {
+        Burger burger = new Burger();
+        Bun bunMock = Mockito.mock(Bun.class);
+
+        Mockito.when(bunMock.getName()).thenReturn(bunName);
+        Mockito.when(bunMock.getPrice()).thenReturn(price / 2);
+        burger.setBuns(bunMock);
+
+        String receipt = burger.getReceipt();
+
+        Assert.assertTrue(
+                "Цена в чеке должна быть отформатирована через %f",
+                receipt.contains(String.format("Price: %f", price))
+        );
+    }
+
+}
